@@ -1,9 +1,12 @@
 div.sidebar {
+    position: sticky;
+    top: 0;
+
     display: flex;
     flex-direction: column;
 
     width: 100%;
-    height: 100%;
+    height: 100dvh;
 
     /* 可視化のためなので、スタイル適用時に消すこと */
     background-color: #eee;
