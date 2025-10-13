@@ -13,7 +13,7 @@ export default function Page(){
             />
             <h1>サインアップ</h1>
             {/* apiと連携 */}
-            <form method="post" action="/">
+            <form method="post" action="/account/login">
                 <p>ユーザー名：<input name="username" required /></p>
                 <p>メールアドレス：<input name="mail" type="main" required /></p>
                 <p>パスワード：<input name="password" type="password" required /></p>

@@ -79,17 +79,15 @@ def api_get_user():
     username = request.args.get('name')
     if not username:
         return jsonify({'error': 'name parameter required'}), 400
-
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute("SELECT id, username, name, bio, ico FROM users WHERE username=?", (username,))
     row = cursor.fetchone()
-    conn.close()
 
     if not row:
+        conn.close()
         return jsonify({'error': 'user not found'}), 404
 
-    # UserGetData shape: map to expected keys
     user = {
         'id': row['id'],
         'username': row['username'],
@@ -97,7 +95,41 @@ def api_get_user():
         'bio': row['bio'],
         'ico': row['ico'],
     }
-    return jsonify(user)
+
+    # counts
+    cursor.execute("SELECT COUNT(*) as cnt FROM follows WHERE following_id = ?", (row['id'],))
+    followers_count = cursor.fetchone()['cnt']
+    cursor.execute("SELECT COUNT(*) as cnt FROM follows WHERE follower_id = ?", (row['id'],))
+    following_count = cursor.fetchone()['cnt']
+
+    # fetch followers (limited to recent 100)
+    cursor.execute("SELECT u.id, u.username, u.name, u.ico FROM follows f JOIN users u ON f.follower_id = u.id WHERE f.following_id = ? ORDER BY f.id DESC LIMIT 100", (row['id'],))
+    followers = [dict(r) for r in cursor.fetchall()]
+
+    # fetch following (limited to recent 100)
+    cursor.execute("SELECT u.id, u.username, u.name, u.ico FROM follows f JOIN users u ON f.following_id = u.id WHERE f.follower_id = ? ORDER BY f.id DESC LIMIT 100", (row['id'],))
+    following = [dict(r) for r in cursor.fetchall()]
+
+    # is_following: does current session user follow this user?
+    is_following = False
+    session_username = session.get('username')
+    if session_username:
+        cursor.execute("SELECT id FROM users WHERE username=?", (session_username,))
+        s = cursor.fetchone()
+        if s:
+            cursor.execute("SELECT 1 FROM follows WHERE follower_id = ? AND following_id = ?", (s['id'], row['id']))
+            is_following = cursor.fetchone() is not None
+
+    result = {
+        **user,
+        'followers_count': followers_count,
+        'following_count': following_count,
+        'followers': followers,
+        'following': following,
+        'is_following': is_following,
+    }
+    conn.close()
+    return jsonify(result)
 
 
 # API: get posts by username
@@ -190,6 +222,76 @@ def api_make_post():
     conn.commit()
     conn.close()
 
+    return jsonify({'ok': True})
+
+
+@app.route('/api/follow', methods=['POST'])
+def api_follow():
+    if 'username' not in session:
+        return jsonify({'error': 'login required'}), 401
+
+    data = request.get_json() or request.form
+    target = data.get('username') or data.get('name')
+    if not target:
+        return jsonify({'error': 'target username required'}), 400
+
+    conn = get_db()
+    cur = conn.cursor()
+    # get follower id (current user)
+    cur.execute("SELECT id FROM users WHERE username=?", (session['username'],))
+    me = cur.fetchone()
+    if not me:
+        conn.close()
+        return jsonify({'error': 'session user not found'}), 400
+
+    # get target id
+    cur.execute("SELECT id FROM users WHERE username=?", (target,))
+    t = cur.fetchone()
+    if not t:
+        conn.close()
+        return jsonify({'error': 'target user not found'}), 404
+
+    # avoid duplicate
+    cur.execute("SELECT 1 FROM follows WHERE follower_id=? AND following_id=?", (me['id'], t['id']))
+    if cur.fetchone():
+        conn.close()
+        return jsonify({'ok': True, 'message': 'already following'})
+
+    cur.execute("INSERT INTO follows (follower_id, following_id, createAt) VALUES (?, ?, datetime('now'))", (me['id'], t['id']))
+    conn.commit()
+    conn.close()
+    return jsonify({'ok': True})
+
+
+@app.route('/api/unfollow', methods=['POST'])
+def api_unfollow():
+    if 'username' not in session:
+        return jsonify({'error': 'login required'}), 401
+
+    data = request.get_json() or request.form
+    target = data.get('username') or data.get('name')
+    if not target:
+        return jsonify({'error': 'target username required'}), 400
+
+    conn = get_db()
+    cur = conn.cursor()
+    # get follower id (current user)
+    cur.execute("SELECT id FROM users WHERE username=?", (session['username'],))
+    me = cur.fetchone()
+    if not me:
+        conn.close()
+        return jsonify({'error': 'session user not found'}), 400
+
+    # get target id
+    cur.execute("SELECT id FROM users WHERE username=?", (target,))
+    t = cur.fetchone()
+    if not t:
+        conn.close()
+        return jsonify({'error': 'target user not found'}), 404
+
+    cur.execute("DELETE FROM follows WHERE follower_id=? AND following_id=?", (me['id'], t['id']))
+    conn.commit()
+    conn.close()
     return jsonify({'ok': True})
 
 

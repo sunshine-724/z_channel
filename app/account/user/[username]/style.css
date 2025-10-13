@@ -1,25 +1,5 @@
-.login {
-    border:3px solid;
-    border-radius: 10rem;
+.user-page{
     margin: 0px auto;
-    margin-top: 4rem;
-    padding: 2rem;
-    text-align: center;
+    padding: 4rem;
     font-size: 2rem;
-}
-.login input{
-    width: 15rem;
-    height: 2rem;
-}
-.login button{
-    margin-top: 4rem;
-    width: 15rem;
-    height: 4rem;
-    font-size: 2rem;
-    background-color: white;
-    border-radius: 1rem;
-    transition: 0.2s;
-}
-.login button:hover{
-    background-color: aliceblue;
 }

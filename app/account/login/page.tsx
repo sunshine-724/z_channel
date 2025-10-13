@@ -13,7 +13,7 @@ export default function Page(){
             />
             <h1>ログイン</h1>
             {/* apiと連携 */}
-            <form method="post" action="/">
+            <form method="post" action="/zweet">
                 <p>ユーザー名：<input name="username" required /></p>
                 <p>パスワード：<input name="password" type="password" required /></p>
                 <p><button type="submit">ログイン</button></p>

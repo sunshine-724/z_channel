@@ -1,8 +1,10 @@
 export type UserType = {
     id : number
+    username?: string
     name : string
     ico : string
 }
+
 export type UserGetData = {
     user : UserType
     profile : {

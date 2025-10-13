@@ -1,30 +1,43 @@
 import Link from "next/link";
 import "./style.css" ;
 import Image from 'next/image';
-import { UserGetData } from '@/types/user';
+import { UserGetData, UserType } from '@/types/user';
+import FollowButton from './FollowButton';
 
 type Props = {
     params: { username: string }
 }
 
-async function fetchUser(username: string): Promise<UserGetData | null> {
+type BackendUserResponse = {
+    id: number
+    username: string
+    name: string
+    bio: string
+    ico: string
+    followers_count?: number
+    following_count?: number
+    followers?: UserType[]
+    following?: UserType[]
+    is_following?: boolean
+}
+
+async function fetchUser(username: string): Promise<BackendUserResponse | null> {
     try {
         // 仮想の外部 API からユーザー情報を取得する想定
-        const res = await fetch(`${process.env.BACKEND_ROOT_URL}/user/${encodeURIComponent(username)}`, {
+        const res = await fetch(`${process.env.BACKEND_ROOT_URL}/api/user?name=${encodeURIComponent(username)}`, {
             method: 'GET',
             headers: { 'Accept': 'application/json' },
             // サーバーサイド fetch の場合はキャッシュ挙動をコントロールできます
             next: { revalidate: 60 }
         })
         if (!res.ok) return null
-        const data: UserGetData = await res.json()
+        const data: BackendUserResponse = await res.json()
         return data
     } catch (e) {
         console.error('fetchUser error', e)
         return null
     }
 }
-
 export default async function Page({ params }: Props){
         const username = params.username
         const data = await fetchUser(username)
@@ -38,22 +51,36 @@ export default async function Page({ params }: Props){
             )
         }
 
-        const { user, profile } = data
-
+        const path = !!data.is_following ? '/api/unfollow' : '/api/follow'
+        const url = `${process.env.BACKEND_ROOT_URL}${path}`
         return (
             <div className="user-page">
                 <div className="user-header">
-                    <Image src={user.ico || '/favicon.ico'} alt={user.name} width={64} height={64} />
-                    <h2>{user.name}</h2>
+                    <Image src={data.ico || '/favicon.ico'} alt={data.username} width={128} height={128} />
+                    <h2>{data.username}</h2>
+                    <div className="user-follow-stats">
+                        <div>フォロワー: {data.followers_count ?? 0}</div>
+                        <div>フォロー中: {data.following_count ?? 0}</div>
+                        <FollowButton 
+                        targetUsername={data.username} 
+                        initialIsFollowing={!!data.is_following}
+                        url={url} />
+                    </div>
                 </div>
                 <div className="user-intro">
-                    <p>{profile.intro}</p>
+                    <p>{data.bio}</p>
                 </div>
-                <div className="user-follow">
-                    <h3>フォロー中 ({profile.follow.length})</h3>
+                <div className="user-follow-list">
+                    <h3>フォロワー</h3>
                     <ul>
-                        {profile.follow.map(f => (
-                            <li key={f.id}>{f.name}</li>
+                        {(data.followers || []).map(f => (
+                            <li key={f.id}><Link href={`/account/user/${f.username}`}>{f.name || f.username}</Link></li>
+                        ))}
+                    </ul>
+                    <h3>フォロー中</h3>
+                    <ul>
+                        {(data.following || []).map(f => (
+                            <li key={f.id}><Link href={`/account/user/${f.username}`}>{f.name || f.username}</Link></li>
                         ))}
                     </ul>
                 </div>

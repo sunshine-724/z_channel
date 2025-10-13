@@ -42,21 +42,16 @@ curl -X POST 'http://127.0.0.1:5000/api/post/make' \
 -H 'Content-Type: application/json' \
 -d '{"text":"テスト投稿","user":{"name":"testuser"},"good":0,"heart":0,"createAt":"2025-10-13T00:00:00Z"}'
 ```
+```bash
+# ログインして cookie を保存
+curl -c cookiejar -d "username=alice&password=PASSWORD" -X POST http://127.0.0.1:5000/login
 
-仕様変更：変更箇所
+# フォローする (alice が bob をフォローする)
+curl -b cookiejar -H "Content-Type: application/json" -d '{"username":"bob"}' -X POST http://127.0.0.1:5000/api/follow
 
-バックエンドの設計を変えてください。
+# フォロー解除
+curl -b cookiejar -H "Content-Type: application/json" -d '{"username":"bob"}' -X POST http://127.0.0.1:5000/api/unfollow
 
-ユーザの投稿 テーブルを追加してください
-ログイン情報のテーブルの設計を変更してください
-今作っているアプリは
-ログイン、およびサインアップ（/register）を作ることでログイン機能を作りますがユーザの情報などを保管する機能がありません。
-getリクエスト
-
-自己紹介 などプロフィールを取得できる/user?name="[username]"、types/user.tsのUserGetDataを参照してそこに当てはまる結果をjsonで返してください
-ユーザの投稿/post/user?name="[username]"、types/labelのLabelTypesを参照してそこに当てはまる値をjsonで返してください
-最新の投稿を取得/post/latest、types/labelのLabelTypesを参照してそこに当てはまる値をjsonで返してください
-postリクエスト
-
-新しい投稿を作成 /post/make
-bodyにtypes/labelのLabelTypeのjsonが与えられます
+# 対象ユーザーの情報を確認 (followers_count, following_count, is_following が含まれる)
+curl http://127.0.0.1:5000/api/user?name=bob
+```
