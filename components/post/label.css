@@ -1,0 +1,36 @@
+.zweetfooter{
+    display: flex;
+    padding: 0.2rem 0.2rem 0.2rem 4rem;
+}
+.zweet-footer span{
+    margin: 2rem;
+}
+.zweet-footer button{
+    width: 3rem;
+    margin-left: 0.5rem;
+    margin-right: 2rem;
+    padding: 0.2rem 1rem 0.2rem 0.2rem;
+    color: gray;
+    background-color: white;
+    border: 1px solid;
+}
+.zweet-footer button:hover{
+
+    color: rgb(0, 0, 0);
+    background-color: rgb(217, 217, 217);
+}
+.zweet-body{
+    font-size: 1rem;
+    padding: 0.5rem;
+}
+.zweet-head{
+    font-weight: 900;
+    padding: 0rem 0rem 0rem 2rem;
+    font-size: 1rem;
+}
+.zweet{
+    width: 100%;
+    border:1px solid;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+}

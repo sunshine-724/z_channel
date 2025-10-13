@@ -1,0 +1,15 @@
+body {
+    position: relative;
+    display: grid;
+    grid-template-columns: 15vw 1fr;
+    gap: 1rem;
+    
+    min-height: 100dvh;
+}
+.zweets{
+    width: 100vh;
+}
+.main{
+    display: flex;
+    
+}
