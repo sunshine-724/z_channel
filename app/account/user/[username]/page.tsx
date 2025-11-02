@@ -4,10 +4,6 @@ import Image from 'next/image';
 import { UserGetData, UserType } from '@/types/user';
 import FollowButton from './FollowButton';
 
-type Props = {
-    params: { username: string }
-}
-
 type BackendUserResponse = {
     id: number
     username: string
@@ -38,7 +34,8 @@ async function fetchUser(username: string): Promise<BackendUserResponse | null> 
         return null
     }
 }
-export default async function Page({ params }: Props){
+
+export default async function Page({ params }: { params: { username: string } }){
         const username = params.username
         const data = await fetchUser(username)
 
