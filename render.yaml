@@ -36,3 +36,6 @@ services:
       # サーバーサイド用 (page.tsx)
       - key: BACKEND_ROOT_URL
         value: http://backend:8000
+
+      - key: HOSTNAME
+        value: "0.0.0.0"

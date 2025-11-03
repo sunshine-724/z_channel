@@ -51,4 +51,6 @@ USER app
 
 # Renderが環境変数 PORT を自動的に設定します
 # ホスト名 0.0.0.0 を指定し、Renderが指定する $PORT を使用
-CMD ["sh", "-c", "node server.js -H 0.0.0.0 -p ${PORT:-3000}"]
+# ...
+# ✔️ シンプルに server.js を起動する形式
+CMD ["node", "server.js"]
