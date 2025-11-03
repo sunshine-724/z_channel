@@ -9,6 +9,7 @@ services:
     dockerContext: ./login_normal
     # pythonアプリのDockerfileを指定
     dockerfilePath: ./login_normal/Dockerfile
+    plan: free
     envVars:
       # Pythonアプリがリッスンする内部ポート
       # (login_normal/Dockerfile のCMDと一致させる)
@@ -23,6 +24,7 @@ services:
     dockerContext: .
     # Next.jsアプリのDockerfile (ルートにある) を指定
     dockerfilePath: ./Dockerfile
+    plan: free
     envVars:
       # Next.jsがリッスンする内部ポート
       # (ルートのDockerfileのCMDと一致させる)
