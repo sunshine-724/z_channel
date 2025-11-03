@@ -27,4 +27,4 @@ USER app
 # Renderが $PORT を自動的に設定します
 # 'app:app' の部分はあなたのFlaskアプリのファイル名とインスタンス名に合わせてください
 # (login_normal/app.py の中の Flaskインスタンスが app だと仮定)
-CMD ["gunicorn", "--workers", "4", "--bind", "0.0.0.0:${PORT:-8000}", "app:app"]
+CMD ["/bin/sh", "-c", "gunicorn --workers 4 --bind 0.0.0.0:${PORT:-8000} app:app"]
