@@ -1,0 +1,5 @@
+# /login_normal/requirements.txt
+Flask
+bcrypt
+gunicorn
+# 他に必要なライブラリ (例: Flask-SQLAlchemy, requestsなど)

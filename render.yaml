@@ -1,0 +1,35 @@
+# /render.yaml (プロジェクトルート)
+
+services:
+  # --- バックエンドサービス (Python) ---
+  - type: web
+    name: backend
+    env: docker
+    # pythonアプリがあるディレクトリを指定
+    dockerContext: ./login_normal
+    # pythonアプリのDockerfileを指定
+    dockerfilePath: ./login_normal/Dockerfile
+    envVars:
+      # Pythonアプリがリッスンする内部ポート
+      # (login_normal/Dockerfile のCMDと一致させる)
+      - key: PORT
+        value: 8000
+
+  # --- フロントエンドサービス (Next.js) ---
+  - type: web
+    name: frontend
+    env: docker
+    # Next.jsアプリがあるディレクトリ (ルート) を指定
+    dockerContext: .
+    # Next.jsアプリのDockerfile (ルートにある) を指定
+    dockerfilePath: ./Dockerfile
+    envVars:
+      # Next.jsがリッスンする内部ポート
+      # (ルートのDockerfileのCMDと一致させる)
+      - key: PORT
+        value: 3000
+      # Next.jsアプリにバックエンドのURLを教える
+      # 'backend' は上記で定義したサービス名
+      # '8000' は上記のbackendのPORT
+      - key: NEXT_PUBLIC_API_URL
+        value: http://backend:8000
