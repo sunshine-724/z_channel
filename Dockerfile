@@ -19,6 +19,8 @@ RUN npm install
 # .dockerignore を使って不要なものを除外すること推奨
 COPY . .
 
+RUN chown -R app:nodejs /app
+
 # 'app' ユーザーに切り替え
 USER app
 
